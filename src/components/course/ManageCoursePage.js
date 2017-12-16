@@ -8,10 +8,17 @@ class ManageCoursePage extends React.Component {
    constructor(props, context){
         super(props.context);
         this.state = {
-           course : {},
+           course : Object.assign({}, props.course),
            errors : {}
         };
         this.updateCourseState = this.updateCourseState.bind(this);
+        this.saveCourse = this.saveCourse.bind(this);
+   };
+   componentWillReceiveProps(nextProps){
+     if(this.props.course.id != nextProps.course.id){
+       //neccessary to populate form when existing course is loaded directly
+       this.setState({course : Object.assign({}, nextProps.course)});
+     }
    };
    updateCourseState(event){
      const field = event.target.name;
@@ -22,6 +29,7 @@ class ManageCoursePage extends React.Component {
    saveCourse(event){
      event.preventDefault();
      this.props.actions.saveCourse(this.state.course);
+     this.context.router.push('/course');
    };
    render(){
      return(
@@ -41,15 +49,28 @@ ManageCoursePage.propTypes = {
      authors : PropTypes.array.isRequired,
      actions : PropTypes.object.isRequired
 };
+//pull in the react router context so that it is available on this.context.router.
+ManageCoursePage.contextTypes = {
+   router : PropTypes.object
+};
+function getCourseById(courses, id){
+     const course = courses.filter(course => course.id == id);
+     if(course.length > 0) return course[0]; //get first value from array as filter return an array
+     return null;
+};
 function mapStateToProps(state, ownProps){
+    const courseId = ownProps.params.id; //id from the url
     let course = {id : '', watchHref:'', title : '', authorId: '', length: '', category : ''};
+    if(courseId && state.courses.length > 0){
+       course = getCourseById(state.courses, courseId);
+    }
+
     const authorsFormattedForDropdown = state.authors.map( author => {
          return {
             value : author.id,
             text : author.firstName +' '+ author.lastName
          };
     });
-
     return {
        course : course,
        authors : authorsFormattedForDropdown
