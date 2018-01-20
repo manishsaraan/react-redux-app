@@ -1,32 +1,41 @@
 import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
+import * as courseActions from '../../actions/courseActions';
+import { bindActionCreators } from 'redux';
+import CourseList from './CourseList';
 
 class CoursesPage extends React.Component {
-	constructor(props, context){
-		super(props, context);
-		this.state = {
-			course : { title : ''}
-		};
-		this.onTitleChange = this.onTitleChange.bind(this);
-		this.onClickSave = this.onClickSave.bind(this);
-	};
-	onTitleChange(event){
-		const course = this.state.course;
-		course.title = event.target.value;
-		this.setState({course : course});
-	};
-	onClickSave(){
-		alert('saving'+this.state.course.title);
-	};
-	render(){
-		return(
+  constructor(props, context){
+    super(props, context);
+  }
+
+  courseRow(course, index){
+    return <div key={index}>{course.title}</div>;
+  }
+  render(){
+    const { courses } = this.props;
+    return(
              <div>
                <h1>Courses</h1>
-               <h2>Add Course</h2>
-               <input type="text" onChange={this.onTitleChange} value={this.state.course.title}/>
-               <input type="submit" value="save" onClick={this.onClickSave}/>
+               <CourseList courses={courses} test="hello"/>
              </div>
-			);
-	}
-};
+      );
+  }
+}
 
-export default CoursesPage;
+CoursesPage.propTypes = {
+  courses : PropTypes.array.isRequired,
+  actions : PropTypes.object.isRequired
+};
+function mapStateToProps(state, ownProps){
+  return {
+    courses : state.courses //state.course is containing key we set up in the reducer ex. courses
+  };
+}
+
+function mapDispatchToProps(dispatch){
+  return {
+    actions : bindActionCreators(courseActions, dispatch) //all actions will be available under this.props.actions
+  };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
