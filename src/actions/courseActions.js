@@ -1,5 +1,6 @@
 import * as types from './actionTypes';
 import courseApi from '../api/mockCourseApi';
+import {  benginAjaxCall } from './ajaxStatusActions';
 
 export function loadCoursesSuccess(courses){
   return {
@@ -22,6 +23,7 @@ export function updateCourseSuccess(course){
 //thunks goes here
 export function loadCourses(){
   return function(dispatch){
+       dispatch(benginAjaxCall());
        return courseApi.getAllCourses().then(courses => {
          dispatch(loadCoursesSuccess(courses));
        }).catch(error => {
@@ -32,6 +34,7 @@ export function loadCourses(){
 
 export function saveCourse(course){
   return function(dispatch, getState){
+    dispatch(benginAjaxCall());
     return courseApi.saveCourse(course).then(saveCourse => {
       course.id ? dispatch(updateCourseSuccess(saveCourse)) :
                   dispatch(createCourseSuccess(saveCourse));
