@@ -1,6 +1,6 @@
 import * as types from './actionTypes';
 import courseApi from '../api/mockCourseApi';
-import {  benginAjaxCall } from './ajaxStatusActions';
+import {  benginAjaxCall, ajaxCallError } from './ajaxStatusActions';
 
 export function loadCoursesSuccess(courses){
   return {
@@ -40,6 +40,7 @@ export function saveCourse(course){
                   dispatch(createCourseSuccess(saveCourse));
     })
     .catch( error => {
+      dispatch(ajaxCallError(error));
       throw(error);
     });
   };
